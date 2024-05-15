@@ -35,4 +35,3 @@ Route::post('/resetar-senha', [AuthController::class, 'resetPassword']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
 Route::put('/usuarios/:id', [UsuariosController::class, 'update'])->name('usuarios.update');
-Route::post('/send-email', [UsuariosController::class, 'teste']);
