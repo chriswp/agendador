@@ -1,0 +1,52 @@
+version: "3.7"
+
+services:
+    agendador-app:
+        container_name: agendador-app
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www
+        networks:
+            - agendador-network
+        depends_on:
+            - agendador-db
+
+    agendador-nginx:
+        container_name: agendador-nginx
+        image: nginx:alpine
+        restart: unless-stopped
+        ports:
+            - ${PORT:-8080}:80
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/:/etc/nginx/conf.d/
+        networks:
+            - agendador-network
+        depends_on:
+            - agendador-app
+
+    agendador-db:
+        container_name: agendador-db
+        image: postgres:12.1
+        restart: unless-stopped
+        tty: true
+        ports:
+            - ${DB_EXTERNAL_PORT}:5432
+        environment:
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_USER=${DB_USERNAME}
+        volumes:
+            - agendador-db:/var/lib/postgresql/data
+            - ./.docker/postgres:/docker-entrypoint-initdb.d
+        networks:
+            - agendador-network
+
+networks:
+    agendador-network:
+        driver: bridge
+volumes:
+    agendador-db: {}
